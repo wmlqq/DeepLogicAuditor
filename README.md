@@ -2,9 +2,9 @@
 
 # DeepLogicAuditor
 
-**学术论文逻辑审计智能体**
+**学术论文逻辑审计智能体** · **Academic Paper Logic Audit Agent**
 
-对论文进行切片、语义建模与规则化逻辑审计，检测逻辑矛盾、逻辑跳跃、结构不完整等问题。
+Slice papers, build semantic graphs, and audit logical consistency with NLI models and rule-based checks.
 
 [![License: MIT](https://img.shields.io/github/license/wmlqq/DeepLogicAuditor?style=flat-square)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
@@ -13,14 +13,17 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![CI](https://img.shields.io/github/actions/workflow/status/wmlqq/DeepLogicAuditor/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/wmlqq/DeepLogicAuditor/actions)
 
-[快速开始](#-快速开始) · [API](#api-概览) · [架构](#-架构) · [文档](docs/GITHUB_UPLOAD.md)
-
+**[中文](#中文)** · **[English](#english)**
 
 </div>
 
 ---
 
-## ✨ 功能特性
+<a id="中文"></a>
+
+## 中文
+
+### ✨ 功能特性
 
 | 模块 | 说明 |
 |------|------|
@@ -30,9 +33,7 @@
 | 🔗 **一体化审计** | 从 PostgreSQL 读取论文，按 LOG-001～LOG-007 规则评分并写回 |
 | 🌐 **REST API** | FastAPI 提供 HTTP 接口，自带 Swagger 文档 |
 
----
-
-## 🛠 技术栈
+### 🛠 技术栈
 
 <p>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
@@ -53,9 +54,7 @@
 | 数据 | PostgreSQL · psycopg2 | 论文、规则与审计结果存储 |
 | 配置 | python-dotenv | 环境变量管理 |
 
----
-
-## 🏗 架构
+### 🏗 架构
 
 ```mermaid
 flowchart LR
@@ -68,107 +67,61 @@ flowchart LR
 ```
 
 ```
-数据库论文 → 切片模块 → 语义建模 → 逻辑审计 → 写回数据库 + 本地 JSON
+数据库论文 → 切片 → 语义建模 → 逻辑审计 → 写回数据库 + 本地 JSON
 ```
 
----
-
-## 📁 项目结构
+### 📁 项目结构
 
 ```
 DeepLogicAuditor/
 ├── src/
-│   ├── config.py                 # 环境变量与路径
-│   ├── database_connector.py     # 数据库访问
-│   ├── logic_auditor/
-│   │   ├── main.py               # FastAPI 入口
-│   │   ├── auditor.py            # 逻辑审计核心
-│   │   └── schemas.py            # API 数据模型
-│   ├── semantic/
-│   │   └── semantic_modeling.py  # 命题提取与 NLI 关系识别
-│   └── slicer/
-│       └── paper_slicer.py       # 论文内容切片
-├── prompts/keywords.json         # 关键词配置示例
-├── tests/test_three_modules.py   # 三模块联调脚本
+│   ├── config.py
+│   ├── database_connector.py
+│   ├── logic_auditor/          # FastAPI 入口与审计核心
+│   ├── semantic/               # NLI 语义建模
+│   └── slicer/                 # 论文切片
+├── prompts/keywords.json
+├── tests/test_three_modules.py
 ├── docs/GITHUB_UPLOAD.md
 ├── .env.example
 ├── requirements.txt
 └── run_api.py
 ```
 
----
+### 🚀 快速开始
 
-## 🚀 快速开始
-
-### 环境要求
-
-- Python 3.10+
-- PostgreSQL 12+
-- （可选）CUDA，用于 GPU 加速推理
-
-### 1. 克隆仓库
+**环境要求：** Python 3.10+ · PostgreSQL 12+ ·（可选）CUDA
 
 ```bash
 git clone https://github.com/wmlqq/DeepLogicAuditor.git
 cd DeepLogicAuditor
-```
-
-### 2. 安装依赖
-
-```bash
 python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux / macOS
-source venv/bin/activate
-
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # Linux / macOS
 pip install -r requirements.txt
+copy .env.example .env         # Windows
+# cp .env.example .env         # Linux / macOS
 ```
 
-### 3. 配置环境变量
-
-```bash
-copy .env.example .env    # Windows
-# cp .env.example .env    # Linux / macOS
-```
-
-编辑 `.env`：
-
-```env
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_NAME=postgres
-DB_USER=your_user
-DB_PASSWORD=your_password
-```
-
-可选：`HF_MIRROR`（国内镜像）、`MODEL_CACHE_DIR`、`OUTPUT_DIR`。
-
-### 4. 启动服务
+编辑 `.env` 填入数据库连接信息。可选：`HF_MIRROR`、`MODEL_CACHE_DIR`、`OUTPUT_DIR`。
 
 ```bash
 python run_api.py
 ```
 
-访问 **[http://localhost:8000/docs](http://localhost:8000/docs)** 查看交互式 API 文档。
+API 文档：[http://localhost:8000/docs](http://localhost:8000/docs)
 
-### 5. 运行联调测试
-
-需已配置数据库且存在论文数据：
+联调测试（需数据库中有论文数据）：
 
 ```bash
 python tests/test_three_modules.py
 ```
 
----
-
-## 📡 API 概览
+### 📡 API 概览
 
 | 方法 | 路径 | 说明 |
 |:----:|------|------|
-| `POST` | `/audit/integrated?paper_id={uuid}` | 从数据库读取论文，完成完整审计流程 |
+| `POST` | `/audit/integrated?paper_id={uuid}` | 从数据库读取论文并完成完整审计 |
 | `POST` | `/audit/paper` | 对 JSON 命题图进行逻辑审计 |
 | `POST` | `/audit/logic` | 对单一切片进行逻辑审计 |
 
@@ -186,31 +139,164 @@ python tests/test_three_modules.py
 
 </details>
 
----
+### 🤖 模型与缓存
 
-## 🤖 模型与缓存
-
-首次运行会自动下载 NLI 模型到 `src/model_cache/`（可通过 `MODEL_CACHE_DIR` 修改）。**请勿将模型文件提交到 Git。**
-
-国内用户建议在 `.env` 中配置镜像：
+首次运行会下载 NLI 模型至 `src/model_cache/`（可通过 `MODEL_CACHE_DIR` 修改），**请勿提交模型文件**。
 
 ```env
 HF_MIRROR=https://hf-mirror.com
 ```
 
----
+### 📄 许可证
 
-## 📄 许可证
-
-本项目采用 [MIT License](LICENSE) 开源。
-
----
+[MIT License](LICENSE)
 
 <div align="center">
 
-**如果这个项目对你有帮助，欢迎 Star ⭐**
+[English](#english) · [报告问题](https://github.com/wmlqq/DeepLogicAuditor/issues) · [Actions](https://github.com/wmlqq/DeepLogicAuditor/actions)
 
-[报告问题](https://github.com/wmlqq/DeepLogicAuditor/issues) · [查看 Actions](https://github.com/wmlqq/DeepLogicAuditor/actions)
+**觉得有用？欢迎 Star ⭐**
 
+</div>
+
+---
+
+<a id="english"></a>
+
+## English
+
+### ✨ Features
+
+| Module | Description |
+|--------|-------------|
+| 📄 **Paper Slicing** | Split Markdown papers into proposition-level segments |
+| 🧠 **Semantic Modeling** | NLI-based entailment / neutral / contradiction detection |
+| 🔍 **Logic Audit** | Contradictions, unsupported claims, missing transitions |
+| 🔗 **Integrated Audit** | Load papers from PostgreSQL, score with LOG-001–LOG-007, persist results |
+| 🌐 **REST API** | FastAPI endpoints with interactive Swagger UI |
+
+### 🛠 Tech Stack
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/>
+  <img src="https://img.shields.io/badge/🤗_Transformers-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black" alt="Transformers"/>
+  <img src="https://img.shields.io/badge/NetworkX-2C5BB4?style=for-the-badge" alt="NetworkX"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+  <img src="https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge" alt="Pydantic"/>
+</p>
+
+| Layer | Technology | Role |
+|-------|------------|------|
+| Runtime | Python 3.10+ | Core language |
+| Web | FastAPI · Uvicorn | REST API & ASGI server |
+| NLP | PyTorch · Transformers | [`cross-encoder/nli-deberta-v3-base`](https://huggingface.co/cross-encoder/nli-deberta-v3-base) |
+| Graph | NetworkX | Semantic relation graphs |
+| Data | PostgreSQL · psycopg2 | Papers, rules, audit results |
+| Config | python-dotenv | Environment variables |
+
+### 🏗 Architecture
+
+```mermaid
+flowchart LR
+    DB[(PostgreSQL)] --> Slicer[Paper Slicer]
+    Slicer --> Semantic[Semantic NLI]
+    Semantic --> Auditor[Logic Auditor]
+    Auditor --> API[FastAPI]
+    API --> DB
+    API --> Output[(output/ JSON)]
+```
+
+```
+Paper in DB → Slicing → Semantic modeling → Logic audit → DB + local JSON
+```
+
+### 📁 Project Layout
+
+```
+DeepLogicAuditor/
+├── src/
+│   ├── config.py
+│   ├── database_connector.py
+│   ├── logic_auditor/          # FastAPI entry & audit core
+│   ├── semantic/               # NLI semantic modeling
+│   └── slicer/                 # Paper slicing
+├── prompts/keywords.json
+├── tests/test_three_modules.py
+├── docs/GITHUB_UPLOAD.md
+├── .env.example
+├── requirements.txt
+└── run_api.py
+```
+
+### 🚀 Quick Start
+
+**Requirements:** Python 3.10+ · PostgreSQL 12+ · (optional) CUDA
+
+```bash
+git clone https://github.com/wmlqq/DeepLogicAuditor.git
+cd DeepLogicAuditor
+python -m venv venv
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # Linux / macOS
+pip install -r requirements.txt
+copy .env.example .env         # Windows
+# cp .env.example .env         # Linux / macOS
+```
+
+Edit `.env` with your database credentials. Optional: `HF_MIRROR`, `MODEL_CACHE_DIR`, `OUTPUT_DIR`.
+
+```bash
+python run_api.py
+```
+
+API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+Integration test (requires paper data in the database):
+
+```bash
+python tests/test_three_modules.py
+```
+
+### 📡 API Overview
+
+| Method | Path | Description |
+|:------:|------|-------------|
+| `POST` | `/audit/integrated?paper_id={uuid}` | Full audit pipeline from database |
+| `POST` | `/audit/paper` | Audit a proposition graph (JSON body) |
+| `POST` | `/audit/logic` | Audit a single text chunk |
+
+<details>
+<summary><b>Integrated audit rules (LOG-001–LOG-007)</b></summary>
+
+| Rule ID | Name |
+|---------|------|
+| LOG-001 | Five-part abstract structure |
+| LOG-002 | Three-level logic closure |
+| LOG-004 | Terminology consistency |
+| LOG-005 | Related-work section flow |
+| LOG-006 | Experiments answer research questions |
+| LOG-007 | Innovation count in conclusion |
+
+</details>
+
+### 🤖 Models & Cache
+
+On first run, the NLI model is downloaded to `src/model_cache/` (override with `MODEL_CACHE_DIR`). **Do not commit model weights.**
+
+```env
+HF_MIRROR=https://hf-mirror.com
+```
+
+### 📄 License
+
+[MIT License](LICENSE)
+
+<div align="center">
+
+[中文](#中文) · [Report an issue](https://github.com/wmlqq/DeepLogicAuditor/issues) · [Actions](https://github.com/wmlqq/DeepLogicAuditor/actions)
+
+**Star ⭐ if this project helps you**
 
 </div>
