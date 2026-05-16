@@ -1,5 +1,7 @@
-import os
 import re
+
+import os
+
 
 import networkx as nx
 
